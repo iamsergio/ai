@@ -37,9 +37,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             print("GADGET_WINDOW_ID=\(window.windowNumber)")
             fflush(stdout)
         }
+
+        if let path = debug.snapshotPath {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                let ok = Self.writeSnapshot(of: window, to: path)
+                print(ok ? "Wrote \(path)" : "Snapshot failed")
+                fflush(stdout)
+                NSApp.terminate(nil)
+            }
+        }
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
+
+    /// Renders the window content (with alpha) straight to a PNG, independent of the window server.
+    private static func writeSnapshot(of window: NSWindow, to path: String) -> Bool {
+        guard let view = window.contentView,
+              let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return false }
+        view.cacheDisplay(in: view.bounds, to: rep)
+        guard let png = rep.representation(using: .png, properties: [:]) else { return false }
+        return (try? png.write(to: URL(fileURLWithPath: path))) != nil
+    }
 
     /// Minimal menu so that ⌘Q works.
     private func installMainMenu() {

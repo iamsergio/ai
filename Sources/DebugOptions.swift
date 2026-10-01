@@ -5,10 +5,15 @@ struct DebugOptions: Equatable {
     var printWindowID = false
     var referenceImagePath: String?
     var useMockData = false
+    /// Render the content view to this PNG shortly after launch, then quit. Needs no screen access.
+    var snapshotPath: String?
 
     init(environment: [String: String] = ProcessInfo.processInfo.environment) {
         printWindowID = environment["GADGET_DEBUG"] == "1"
         useMockData = environment["GADGET_MOCK"] == "1"
+        if let path = environment["GADGET_SNAPSHOT"], !path.isEmpty {
+            snapshotPath = path
+        }
         if let path = environment["GADGET_REF"], !path.isEmpty {
             referenceImagePath = path
         }
