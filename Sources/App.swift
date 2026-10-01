@@ -36,7 +36,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         if debug.debugKeys {
             keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [gauges] event in
-                guard event.charactersIgnoringModifiers?.lowercased() == "r",
+                guard !event.isARepeat,
+                      event.charactersIgnoringModifiers?.lowercased() == "r",
                       event.modifierFlags.intersection([.command, .control, .option]).isEmpty else { return event }
                 gauges.randomize()
                 return nil

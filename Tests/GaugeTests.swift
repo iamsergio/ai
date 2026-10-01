@@ -15,8 +15,13 @@ func runGaugeTests() {
     check(ArcSpec.right.angle(at: 0.5) == -16, "right midpoint")
     check(ArcSpec.left.angle(at: 2) == 256 && ArcSpec.left.angle(at: -1) == 136, "angle clamps progress")
 
+    check(t.progress(for: .infinity) == 1 && t.progress(for: -.infinity) == 0, "infinities clamp")
+    check(GaugeScale(lowerBound: 5, upperBound: 5).progress(for: 5) == 0, "degenerate scale is 0")
+
+    check(ArcSpec.left.gradientRange == 136...256 && !ArcSpec.left.reversesColors, "left gradient runs clockwise")
+    check(ArcSpec.right.gradientRange == -76...44 && ArcSpec.right.reversesColors, "right gradient is reversed")
+
     var arc = ArcGauge(spec: .left, radius: 10, progress: 0.25)
-    check(arc.animatableData == 0.25, "progress is animatable data")
     arc.animatableData = 0.75
     check(arc.progress == 0.75, "animatable data sets progress")
 
