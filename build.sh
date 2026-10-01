@@ -8,9 +8,13 @@ BUNDLE_ID=com.example.myapp
 APP="build/$NAME.app"
 
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
 swiftc -O -target arm64-apple-macos14 -parse-as-library Sources/*.swift -o "$APP/Contents/MacOS/$NAME"
+
+cp -R img "$APP/Contents/Resources/img"
+find "$APP/Contents/Resources/img" -name .DS_Store -delete
+rm -rf "$APP/Contents/Resources/img/3d-icon-reference/cloud.blend" "$APP/Contents/Resources/img/3d-icon-reference/preview-render.png"
 
 cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
