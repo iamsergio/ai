@@ -1,4 +1,5 @@
 import AppKit
+import SceneKit
 
 /// The single window-size constant, in points. Everything else is relative to it.
 let windowSize: CGFloat = 500
@@ -74,8 +75,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard let view = window.contentView,
               let rep = view.bitmapImageRepForCachingDisplay(in: view.bounds) else { return false }
         view.cacheDisplay(in: view.bounds, to: rep)
+        drawSceneViews(of: view, into: rep)
         guard let png = rep.representation(using: .png, properties: [:]) else { return false }
         return (try? png.write(to: URL(fileURLWithPath: path))) != nil
+    }
+
+    /// `cacheDisplay` doesn't capture SceneKit's Metal output, so each `SCNView` is drawn from its own
+    /// snapshot, clipped to the pager circle. The hard clip approximates the pager's soft vignette.
+    private static func drawSceneViews(of view: NSView, into rep: NSBitmapImageRep) {
+        func sceneViews(in v: NSView) -> [SCNView] {
+            v.subviews.flatMap { ($0 as? SCNView).map { [$0] } ?? sceneViews(in: $0) }
+        }
+        guard let ctx = NSGraphicsContext(bitmapImageRep: rep) else { return }
+        NSGraphicsContext.saveGraphicsState()
+        defer { NSGraphicsContext.restoreGraphicsState() }
+        NSGraphicsContext.current = ctx
+        let b = view.bounds
+        let d = min(b.width, b.height)
+        let r = d * PagerLayout.diameter / 2
+        // The bitmap context is unflipped: y grows upwards, so the pager centre lies below midY.
+        let flip = { (rect: NSRect) in view.isFlipped ? NSRect(x: rect.minX, y: b.height - rect.maxY,
+                                                               width: rect.width, height: rect.height) : rect }
+        let centre = flip(NSRect(x: b.midX, y: b.midY + d * PagerLayout.centreOffset, width: 0, height: 0)).origin
+        NSBezierPath(ovalIn: NSRect(x: centre.x - r, y: centre.y - r, width: 2 * r, height: 2 * r)).addClip()
+        for scn in sceneViews(in: view) where !scn.isHiddenOrHasHiddenAncestor {
+            scn.snapshot().draw(in: flip(scn.convert(scn.bounds, to: view)))
+        }
     }
 
     /// Minimal menu so that ⌘Q works.

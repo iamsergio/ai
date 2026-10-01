@@ -50,7 +50,11 @@ struct PagerView: View {
 
     private var currentPage: some View {
         Group {
-            if let image = nsImage(model.currentIconResource) {
+            if imageURL(CloudScene.resource) != nil {
+                // Paused while page 2 is at rest; a drag may bring page 1 back into view.
+                CloudSceneView(active: page == 0 || dragging)
+                    .allowsHitTesting(false)
+            } else if let image = nsImage(model.currentIconResource) {
                 Image(nsImage: image)
                     .renderingMode(.template)
                     .resizable()
