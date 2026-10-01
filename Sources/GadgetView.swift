@@ -1,7 +1,6 @@
 import SwiftUI
 
 /// Root view of the gadget. Everything is sized from the dial diameter `D`.
-/// Placeholder artwork until M3 replaces it.
 struct GadgetView: View {
     private let referenceImage: NSImage?
 
@@ -20,10 +19,7 @@ struct GadgetView: View {
         GeometryReader { proxy in
             let d = min(proxy.size.width, proxy.size.height)
             ZStack {
-                Circle().fill(Color(white: 0.12))
-                Circle()
-                    .fill(Color(red: 0.05, green: 0.3, blue: 0.33))
-                    .frame(width: d * DialGeometry.faceRadiusFraction, height: d * DialGeometry.faceRadiusFraction)
+                DialArtwork(d: d)
                 referenceOverlay(diameter: d)
             }
             .frame(width: d, height: d)
