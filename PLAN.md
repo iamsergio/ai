@@ -124,6 +124,8 @@ blue → magenta at the top), so a hot day reveals magenta at the tip. Check thi
 ### M8 — 3D cloud
 - [ ] `GLBLoader`: parse the GLB header, JSON chunk (`Codable`) and BIN chunk; accessors (float VEC2/VEC3, u16/u32 indices) → `SCNGeometrySource`/`SCNGeometryElement`; node TRS hierarchy (glTF and SceneKit are both Y-up, so no conversion); `baseColorFactor` materials
 - [ ] Skip primitives with **no material**. They are Blender helper/boolean-cutter objects (meshes 5–8, 14, 15, 17). Check this visually
+      Found during M8: the file also exports draft clouds (hidden in Blender) with the cloud material at other
+      positions. Only `Icosphere.007` sits above the raindrop paths; `CloudScene` keeps that one by name
 - [ ] Tests: parse `cloud.glb` and check node, mesh and animation counts, plus that material-less meshes are skipped
 - [ ] Play the 6 glTF animations (raindrops falling) as looping `CAKeyframeAnimation`s on `position`
 - [ ] Look: tan/cream cloud and cyan drops (override the dark-blue "water" material to match the screenshot), toon/cel shading through a SceneKit lighting shader modifier that quantizes diffuse into 2–3 bands, faceted (flat) normals

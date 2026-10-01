@@ -50,6 +50,8 @@ screenshot and view it (Read the PNG) before calling it done, and compare it wit
 
 - `./screenshot.sh [out.png]` makes the app render its own content to a PNG (`GADGET_SNAPSHOT=<png>`, with alpha) and
   quit. It is deterministic and needs no screen access. Env vars pass through. Leave `GADGET_REF` out for a clean image.
+  The 3D cloud (Metal) is composited from `SCNView.snapshot()` with a hard clip to the pager circle, so the soft
+  vignette edge on the cloud, and the raindrop positions (they animate), are only faithful with `--window`.
 - `./screenshot.sh --window [out.png]` grabs the real window with `screencapture -l`. It fails intermittently
   ("could not create image from window") because it depends on window-server access, so use it only for
   things the snapshot can't show (window shadow, drag, click-through). If it fails, fall back to the snapshot and
