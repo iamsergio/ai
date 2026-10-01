@@ -11,12 +11,19 @@ final class GadgetWindow: NSWindow {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var window: NSWindow?
-    private let gauges = GaugeModel()
+    private var gauges = WeatherModel()
+    private var refreshTask: Task<Void, Never>?
     private var keyMonitor: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let debug = DebugOptions()
         installMainMenu()
+
+        if debug.useMockData {
+            gauges = .mock()
+        } else {
+            refreshTask = Task { [gauges] in await gauges.run() }
+        }
 
         let window = GadgetWindow(
             contentRect: NSRect(x: 0, y: 0, width: windowSize, height: windowSize),

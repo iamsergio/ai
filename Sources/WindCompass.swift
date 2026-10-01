@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Small compass: the rose with the chevron on top, rotated to the wind direction.
-/// `rotation` is the unbounded angle from `GaugeModel.compassRotation`, so animation takes the short way.
+/// `rotation` is the unbounded angle from `WeatherModel.compassRotation`, so animation takes the short way.
 struct WindCompass: View {
     /// Compass diameter as a fraction of the dial diameter D.
     static let sizeFraction: CGFloat = 0.095

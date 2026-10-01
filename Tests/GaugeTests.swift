@@ -60,8 +60,8 @@ func runReadoutTests() {
     check(ReadoutFormat.windSpeed(.nan) == "--" && ReadoutFormat.windSpeed(-0.4) == "0", "wind edge cases")
 
     MainActor.assumeIsolated {
-        let model = GaugeModel()
-        check(model.compassRotation == MockData.windDirection && MockData.windDirection == 250, "model starts at mock direction")
+        let model = WeatherModel.mock()
+        check(model.compassRotation == MockData.windDirection && MockData.windDirection == 250, "mock model starts at mock direction")
         model.setWindDirection(350)
         model.setWindDirection(10)
         check(model.compassRotation == 370 && model.windDirection == 10, "model unwraps across north")
@@ -69,6 +69,6 @@ func runReadoutTests() {
 
     check(MockData.location == "Vila Real" && MockData.temperature == 21 && MockData.windSpeed == 6, "mock matches screenshot")
     check(MockData.forecast.count == 7, "mock has 7 days")
-    check(MockData.forecast[0] == DailyForecast(day: "Tue", high: 22, low: 16), "mock Tue 22/16")
-    check(MockData.forecast[1] == DailyForecast(day: "Wed", high: 20, low: 13), "mock Wed 20/13")
+    check(MockData.forecast[0] == DailyForecast(day: "Tue", high: 22, low: 16, code: 0), "mock Tue 22/16")
+    check(MockData.forecast[1] == DailyForecast(day: "Wed", high: 20, low: 13, code: 0), "mock Wed 20/13")
 }

@@ -3,9 +3,9 @@ import SwiftUI
 /// Root view of the gadget. Everything is sized from the dial diameter `D`.
 struct GadgetView: View {
     private let referenceImage: NSImage?
-    let model: GaugeModel
+    let model: WeatherModel
 
-    init(model: GaugeModel, debug: DebugOptions = DebugOptions()) {
+    init(model: WeatherModel, debug: DebugOptions = DebugOptions()) {
         self.model = model
         if let path = debug.referenceImagePath {
             referenceImage = NSImage(contentsOfFile: path)
