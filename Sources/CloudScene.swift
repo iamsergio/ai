@@ -1,7 +1,7 @@
 import SceneKit
 
 /// Builds the 3D condition icon from `cloud.glb`: toon look, lights, camera framing, the glTF
-/// raindrop animations and a gentle idle sway. Always a cloud, whatever the weather code.
+/// raindrop animations and a slow clockwise spin. Always a cloud, whatever the weather code.
 enum CloudScene {
     static let resource = "3d-icon-reference/cloud.glb"
 
@@ -16,6 +16,8 @@ enum CloudScene {
     static let fieldOfView: CGFloat = 30
     /// Extra room around the bounding sphere, so falling drops stay inside the vignette.
     static let margin: Float = 1.12
+    /// Seconds per full clockwise turn.
+    static let spinPeriod: TimeInterval = 12
 
     /// Quantises diffuse lighting into three bands (cel shading).
     static let toonShader = """
@@ -102,13 +104,12 @@ enum CloudScene {
     }
 
     private static func idleMotion() -> SCNAction {
-        let sway = SCNAction.sequence([.rotateBy(x: 0, y: 0.14, z: 0, duration: 3),
-                                       .rotateBy(x: 0, y: -0.14, z: 0, duration: 3)])
+        // Negative yaw is clockwise when seen from above (SceneKit is right-handed, Y up).
+        let spin = SCNAction.rotateBy(x: 0, y: -2 * .pi, z: 0, duration: spinPeriod)
         let bob = SCNAction.sequence([.moveBy(x: 0, y: 0.15, z: 0, duration: 2),
                                       .moveBy(x: 0, y: -0.15, z: 0, duration: 2)])
-        sway.timingMode = .easeInEaseOut
         bob.timingMode = .easeInEaseOut
-        return .group([.repeatForever(sway), .repeatForever(bob)])
+        return .group([.repeatForever(spin), .repeatForever(bob)])
     }
 
     /// Bounds of all nodes with geometry under `root`, in `root`'s local space.
