@@ -29,6 +29,7 @@ struct GadgetView: View {
                 GaugeArcView(d: d, spec: .right, progress: model.windProgress,
                              colors: [.white, Color(white: 0.55), Color(white: 0.2)],
                              glow: 0.35)
+                ReadoutsView(d: d, model: model)
                 referenceOverlay(diameter: d)
             }
             .frame(width: d, height: d)
