@@ -8,6 +8,9 @@ struct DebugOptions: Equatable {
     /// Render the content view to this PNG shortly after launch, then quit. Needs no screen access.
     var snapshotPath: String?
 
+    /// Debug keys (R randomizes the gauges) are active when either debug switch is set.
+    var debugKeys: Bool { printWindowID || useMockData }
+
     init(environment: [String: String] = ProcessInfo.processInfo.environment) {
         printWindowID = environment["GADGET_DEBUG"] == "1"
         useMockData = environment["GADGET_MOCK"] == "1"
