@@ -15,3 +15,10 @@ enum ReadoutFormat {
 
     static func windSpeed(_ kmh: Double) -> String { rounded(kmh) }
 }
+
+extension ReadoutFormat {
+    /// "22º / 16º"
+    static func dayRange(high: Double, low: Double) -> String {
+        "\(temperature(high)) / \(temperature(low))"
+    }
+}

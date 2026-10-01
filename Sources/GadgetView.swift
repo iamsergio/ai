@@ -4,9 +4,11 @@ import SwiftUI
 struct GadgetView: View {
     private let referenceImage: NSImage?
     let model: WeatherModel
+    private let startOnForecast: Bool
 
     init(model: WeatherModel, debug: DebugOptions = DebugOptions()) {
         self.model = model
+        startOnForecast = debug.startOnForecast
         if let path = debug.referenceImagePath {
             referenceImage = NSImage(contentsOfFile: path)
             if referenceImage == nil {
@@ -30,6 +32,7 @@ struct GadgetView: View {
                              colors: [.white, Color(white: 0.55), Color(white: 0.2)],
                              glow: 0.35)
                 ReadoutsView(d: d, model: model)
+                PagerView(d: d, model: model, startPage: startOnForecast ? 1 : 0)
                 referenceOverlay(diameter: d)
             }
             .frame(width: d, height: d)
