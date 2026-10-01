@@ -9,6 +9,13 @@ struct DialGeometry {
     /// Teal face radius as a fraction of R. Everything between this and R is rim and bezel.
     static let faceRadiusFraction: CGFloat = 0.73
 
+    /// Black bezel outer radius as a fraction of R (inside the metallic rim).
+    static let bezelOuterFraction: CGFloat = 0.95
+    /// Wordmark centre above the dial centre, as a fraction of R.
+    static let wordmarkOffsetFraction: CGFloat = 0.83
+    /// Wordmark font size as a fraction of D.
+    static let wordmarkFontFraction: CGFloat = 0.072
+
     let diameter: CGFloat
 
     var radius: CGFloat { diameter / 2 }
