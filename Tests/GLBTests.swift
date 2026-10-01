@@ -32,6 +32,14 @@ func runGLBTests() {
     }
     let water = meshNodes.filter { $0.geometry?.firstMaterial?.name == "water" }
     check(water.count == 5, "5 raindrops")
+    // PBR factors from the file: both materials are dielectric; the cloud is glossy (roughness 0.042).
+    let cloudMaterial = meshNodes.first { $0.geometry?.firstMaterial?.name == "Material.001" }?.geometry?.firstMaterial
+    let waterMaterial = water.first?.geometry?.firstMaterial
+    check(cloudMaterial?.lightingModel == .physicallyBased && waterMaterial?.lightingModel == .physicallyBased,
+          "physically based materials")
+    check((cloudMaterial?.metalness.contents as? CGFloat) == 0
+          && abs((cloudMaterial?.roughness.contents as? CGFloat ?? 1) - 0.0424) < 1e-3, "cloud metalness and roughness")
+    check((waterMaterial?.roughness.contents as? CGFloat).map { abs($0 - 0.5) < 1e-6 } == true, "water roughness")
     check(glb.rootNode.childNode(withName: "Empty", recursively: true)?.simdPosition == SIMD3(0, -1, -0.5),
           "node translation")
 
@@ -73,6 +81,20 @@ func runGLBTests() {
         check(clouds == [CloudScene.cloudNode] && drops == 5, "one cloud and 5 drops, got \(clouds) and \(drops)")
         check(scene.rootNode.childNode(withName: "Empty.003", recursively: true)?.animationKeys == ["glTF"],
               "raindrop animation attached")
-        check(scene.rootNode.childNodes(passingTest: { n, _ in n.camera != nil }).count == 1, "scene has a camera")
+        let cameras = scene.rootNode.childNodes(passingTest: { n, _ in n.camera != nil })
+        check(cameras.count == 1, "scene has a camera")
+
+        // The designer's three point lights ride on the camera; key upper-left, rim behind, fill right.
+        let lights = cameras.first?.childNodes.filter { $0.light?.type == .omni } ?? []
+        check(lights.map(\.name) == ["key", "rim", "fill"], "three studio lights on the camera, got \(lights.map(\.name))")
+        if let camera = cameras.first, lights.count == 3 {
+            let toCloud = camera.simdConvertPosition(.zero, from: scene.rootNode)
+            let rel = lights.map { $0.simdPosition - toCloud }
+            check(rel[0].x < 0 && rel[0].y > 0 && rel[0].z > 0, "key light upper left, in front of the cloud")
+            check(rel[1].z < 0 && rel[2].x > 0, "rim light behind, fill light on the right")
+            check(lights.allSatisfy { $0.light!.intensity > 0 }, "lights are on")
+        }
+        check(scene.lightingEnvironment.contents != nil, "environment light set")
     }
+    check(CloudScene.skyImage().map { $0.width == 64 && $0.height == 32 } == true, "sky image size")
 }

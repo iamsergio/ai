@@ -128,7 +128,11 @@ blue → magenta at the top), so a hot day reveals magenta at the tip. Check thi
       positions. Only `Icosphere.007` sits above the raindrop paths; `CloudScene` keeps that one by name
 - [ ] Tests: parse `cloud.glb` and check node, mesh and animation counts, plus that material-less meshes are skipped
 - [ ] Play the 6 glTF animations (raindrops falling) as looping `CAKeyframeAnimation`s on `position`
-- [ ] Look: tan/cream cloud and cyan drops (override the dark-blue "water" material to match the screenshot), toon/cel shading through a SceneKit lighting shader modifier that quantizes diffuse into 2–3 bands, faceted (flat) normals
+- [ ] Look: tan/cream cloud and cyan drops (override the dark-blue "water" material to match the screenshot), faceted (flat) normals
+      Revised (#29): the cel bands flattened every facet to one tone. Now physically-based materials with the
+      file's metallic/roughness, lit by the three Cycles point lights from `cloud.blend` (the glTF export drops
+      lights), kept camera-relative, plus a generated sky as `lightingEnvironment` for soft fill. The meshes have UVs
+      but no textures, so UV mapping plays no part in the look
 - [ ] Camera framed from the bounding box of visible nodes, slight top-down angle, larger bump on the left as in the screenshot
 - [ ] Gentle idle motion (slow bob or yaw sway)
 - [ ] Embed in page 1. Confirm the SwiftUI vignette mask and page offset apply to the `SCNView`. If the mask doesn't apply, set a `CAGradientLayer` mask on the view's layer instead

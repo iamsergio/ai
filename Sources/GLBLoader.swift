@@ -37,7 +37,11 @@ struct GLTFDocument: Decodable {
         var byteStride: Int?
     }
     struct Material: Decodable {
-        struct PBR: Decodable { var baseColorFactor: [Float]? }
+        struct PBR: Decodable {
+            var baseColorFactor: [Float]?
+            var metallicFactor: Float?
+            var roughnessFactor: Float?
+        }
         var name: String?
         var doubleSided: Bool?
         var pbrMetallicRoughness: PBR?
@@ -265,6 +269,10 @@ enum GLBLoader {
         let space = NSColorSpace(cgColorSpace: CGColorSpace(name: CGColorSpace.extendedLinearSRGB)!)!
         let comps = (0..<4).map { CGFloat(c[safe: $0] ?? 1) }
         material.diffuse.contents = NSColor(colorSpace: space, components: comps, count: 4)
+        // glTF defaults: fully metallic and rough when the factors are absent.
+        material.lightingModel = .physicallyBased
+        material.metalness.contents = CGFloat(m.pbrMetallicRoughness?.metallicFactor ?? 1)
+        material.roughness.contents = CGFloat(m.pbrMetallicRoughness?.roughnessFactor ?? 1)
         material.isDoubleSided = m.doubleSided ?? false
         return material
     }
