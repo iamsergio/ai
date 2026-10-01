@@ -11,6 +11,8 @@ final class GadgetWindow: NSWindow {
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var window: NSWindow?
+    private let gauges = GaugeModel()
+    private var keyMonitor: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         let debug = DebugOptions()
@@ -25,12 +27,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         window.backgroundColor = .clear
         window.hasShadow = false
         window.isReleasedWhenClosed = false
-        window.contentView = DialHostingView(rootView: GadgetView(debug: debug))
+        window.contentView = DialHostingView(rootView: GadgetView(model: gauges, debug: debug))
         window.center()
         window.makeKeyAndOrderFront(nil)
         self.window = window
 
         NSApp.activate(ignoringOtherApps: true)
+
+        if debug.debugKeys {
+            keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [gauges] event in
+                guard event.charactersIgnoringModifiers?.lowercased() == "r",
+                      event.modifierFlags.intersection([.command, .control, .option]).isEmpty else { return event }
+                gauges.randomize()
+                return nil
+            }
+        }
 
         if debug.printWindowID {
             // The window number is the CGWindowID expected by `screencapture -l`.
